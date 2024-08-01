@@ -9,7 +9,6 @@ The EcoCI plugin retrieves the `energy` and the `carbon` of the workflow of the 
 The EcoCI plugin fetches the `energy` and `carbon` of the specified workflow from the Green Metrics API for each entry in a manifest's input data.
 
 - The `timestamp` and `duration` fields in the input data are used to filter the `energy` and `carbon` data. The relevant endpoint is documented [here](https://api.green-coding.io/docs).
-- The Green Metrics API provides data if the `timestamp` have zero time – e.g., is exact date.
 
 ## Usage
 
@@ -46,7 +45,7 @@ runPlugin();
 
 ## Input Parameters
 
-- `timestamp`: (required) specifies the start of the time range for retrieving data from the EcoCI API. Note that the EcoCI API provides data if the date have zero time – e.g., is exact dates.
+- `timestamp`: (required) specifies the start of the time range for retrieving data from the EcoCI API.
 - `duration`: (required) specifies the end of the time range for retrieving data from the API. It can be either number or string like `24 * 60 * 60 * 1000`.
 
 ## Output
