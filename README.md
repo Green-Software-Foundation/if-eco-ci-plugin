@@ -2,7 +2,7 @@
 
 ## Overview
 
-The EcoCI plugin retrieves the `energy` and the `carbon` of the workflow of the a given repository using the [Green Metrics](https://metrics.green-coding.io/index.html) API, if the workflow of the repository is listed in the [CI projects](https://metrics.green-coding.io/ci-index.html).
+The EcoCI plugin retrieves the `energy` and the `carbon` of the workflow of the given repository using the [Green Metrics](https://metrics.green-coding.io/index.html) API, if the workflow of the repository is listed in the [CI projects](https://metrics.green-coding.io/ci-index.html).
 
 ## Implementation
 
