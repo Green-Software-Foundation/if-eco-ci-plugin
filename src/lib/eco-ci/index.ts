@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import moment from 'moment-timezone';
 import { ERRORS, validate } from '@grnsft/if-core/utils';
 import {
   PluginParams,
@@ -94,15 +95,14 @@ export const EcoCI = (
 
     const data = metrics.reduce(
       (acc: { energy: number; carbon: number }, item: number[]) => {
-        const resetedTimeDate = item[3].toString().split('T')[0] + 'T00:00';
-        const dateInMilliseconds = new Date(resetedTimeDate).getTime();
-        const startRange = new Date(input.timestamp).getTime();
+        const dateInMilliseconds = moment
+          .tz(item[3].toString(), 'UTC')
+          .toDate()
+          .getTime();
+        const startRange = moment.tz(input.timestamp, 'UTC').toDate().getTime();
         const endRange = startRange + eval(input.duration);
 
-        if (
-          dateInMilliseconds >= new Date(input.timestamp).getTime() &&
-          dateInMilliseconds <= endRange
-        ) {
+        if (dateInMilliseconds >= startRange && dateInMilliseconds < endRange) {
           acc.energy += item[0];
           acc.carbon += parseFloat(item[item.length - 1].toString());
           return acc;
