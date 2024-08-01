@@ -27,7 +27,8 @@
     "strictPropertyInitialization": true,
     "stripInternal": false,
     "target": "ES2020",
-    "composite": false
+    "composite": false,
+    "esModuleInterop": true,
   },
   "include": [
     "src/**/*.ts",
