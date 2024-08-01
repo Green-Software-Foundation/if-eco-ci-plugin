@@ -13,7 +13,7 @@ The EcoCI plugin fetches the `energy` and `carbon` of the specified workflow fro
 
 ## Usage
 
-To run the `EcoCI` plugin, an instance of `ExecutePlugin` must be created. Then, the plugin's `execute()` method can be called, passing required arguments to it.
+To run the `EcoCI` plugin, an instance of `ExecutePlugin` must be created. Then, the plugin's `execute()` method can be called, passing the required arguments to it.
 
 This is how you could run the model in Typescript:
 
