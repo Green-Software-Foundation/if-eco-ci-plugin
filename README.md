@@ -88,7 +88,8 @@ tree:
   children:
     child:
       pipeline:
-        - ci/cd
+        compute:
+          - ci/cd
       config:
       inputs:
         - timestamp: 2024-07-09T00:00
