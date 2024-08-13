@@ -16,8 +16,9 @@ export const EcoCiAPI = () => {
         { params }
       );
 
+      // In case of status 204, the API returns `statusText: No Content` and the `data: undefined`
       if (result.status == 204) {
-        return {};
+        return [];
       }
 
       if (!result?.data?.success) {
