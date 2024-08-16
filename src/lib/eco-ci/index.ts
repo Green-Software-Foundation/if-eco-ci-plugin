@@ -43,6 +43,7 @@ export const EcoCI = (
 
     return inputs.map((input, index) => {
       validateInput(input, index);
+
       const { energy, carbon } = calculateMetrics(result, input);
 
       return {
@@ -60,21 +61,28 @@ export const EcoCI = (
     config: ConfigParams,
     inputs: PluginParams[]
   ) => {
+    const {
+      repo,
+      branch,
+      workflow,
+      'start-date': start,
+      'end-date': end,
+    } = config;
+
     inputs.map((input, index) => {
       validateInput(input, index);
     });
 
-    const firstTimestamp = inputs[0].timestamp;
-    const endTimestamp = inputs[inputs.length - 1].timestamp;
-    const endDuration = inputs[inputs.length - 1].duration;
-    const { repo, branch, workflow } = config;
-    const evaledDuration = eval(endDuration);
+    const firstTimestamp = start || inputs[0].timestamp;
+    const endTimestamp =
+      start && !end ? start : end || inputs[inputs.length - 1].timestamp;
+    const evaledDuration = eval(inputs[inputs.length - 1]?.duration);
+
     const { startDate, endDate } = getOnlyDates(
       firstTimestamp,
       endTimestamp,
       evaledDuration
     );
-
     const params: EcoCiParams = {
       repo,
       branch,
@@ -92,6 +100,7 @@ export const EcoCI = (
    */
   const calculateMetrics = (metrics: [], input: PluginParams) => {
     const kWhForJ = 2.78e-8;
+    const { 'start-date': startDate, 'end-date': endDate } = globalConfig;
 
     const data = metrics.reduce(
       (acc: { energy: number; carbon: number }, item: number[]) => {
@@ -99,8 +108,10 @@ export const EcoCI = (
           .tz(item[3].toString(), 'UTC')
           .toDate()
           .getTime();
-        const startRange = moment.tz(input.timestamp, 'UTC').toDate().getTime();
-        const endRange = startRange + eval(input.duration);
+        const startRange = moment.utc(startDate || input.timestamp).valueOf();
+        const endRange = endDate
+          ? moment.utc(endDate).valueOf()
+          : startRange + eval(input.duration) * 1000;
 
         if (dateInMilliseconds >= startRange && dateInMilliseconds < endRange) {
           acc.energy += item[0];
@@ -122,21 +133,20 @@ export const EcoCI = (
    * Drops time part and returns only dates.
    */
   const getOnlyDates = (
-    startTimestamp: string,
-    endTimestamp: string,
+    startDate: string,
+    endDate: string,
     duration: number
   ) => {
-    const startDate = startTimestamp.split('T')[0];
-    const endTimestampDate = endTimestamp.split('T')[0];
-    const endTimestampDateInMilliseconds = new Date(endTimestampDate).getTime();
-    const endDateInMilliseconds = new Date(
-      duration + endTimestampDateInMilliseconds
-    );
-    const isoEndDate = new Date(
-      endDateInMilliseconds.getTime() -
-        endDateInMilliseconds.getTimezoneOffset() * 60000
-    ).toISOString();
-    const endDate = isoEndDate.split('T')[0];
+    const startTimestampSeconds = new Date(startDate).getTime() / 1000;
+    const endTimestampSeconds = new Date(endDate).getTime() / 1000;
+    const range = endTimestampSeconds - startTimestampSeconds;
+
+    if (range === 0) {
+      const endDateInMilliseconds = (duration + endTimestampSeconds) * 1000;
+      endDate = new Date(
+        endDateInMilliseconds - new Date().getTimezoneOffset() * 60000
+      ).toISOString();
+    }
 
     return {
       startDate,
@@ -172,6 +182,8 @@ export const EcoCI = (
       repo: z.string().regex(/^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+$/),
       branch: z.string(),
       workflow: z.number(),
+      'start-date': z.string().or(z.date()).optional(),
+      'end-date': z.string().or(z.date()).optional(),
     });
 
     return validate<z.infer<typeof schema>>(schema, globalConfig);
