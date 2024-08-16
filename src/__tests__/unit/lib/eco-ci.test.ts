@@ -17,6 +17,8 @@ describe('lib/eco-ci: ', () => {
       repo: 'Green-Software-Foundation/if',
       branch: 'main',
       workflow: 66389738,
+      'start-date': '2024-07-24',
+      'end-date': '2024-07-25',
     };
     const parametersMetadata = {
       inputs: {},
@@ -114,7 +116,7 @@ describe('lib/eco-ci: ', () => {
         const inputs = [
           {
             timestamp: '2024-07-24T00:00',
-            duration: 24 * 60 * 60 * 1000,
+            duration: 24 * 60 * 60,
           },
         ];
 
@@ -136,11 +138,16 @@ describe('lib/eco-ci: ', () => {
       });
 
       it('executes when the time range is smaller than the API data time range.', async () => {
+        const config = {
+          repo: 'Green-Software-Foundation/if',
+          branch: 'main',
+          workflow: 66389738,
+        };
         const ecoCi = EcoCI(config, parametersMetadata);
         const inputs = [
           {
             timestamp: '2024-07-24T10:00',
-            duration: 11 * 60 * 60 * 1000,
+            duration: 11 * 60 * 60,
           },
         ];
 
@@ -158,6 +165,38 @@ describe('lib/eco-ci: ', () => {
         response.forEach((item) => {
           expect(item).toHaveProperty('energy', 0.0000023212166);
           expect(item).toHaveProperty('carbon', 0.041255026);
+        });
+      });
+
+      it('executes when `end-date` is missing and `start-date` persists.', async () => {
+        const config = {
+          repo: 'Green-Software-Foundation/if',
+          branch: 'main',
+          workflow: 66389738,
+          'start-date': '2024-07-24',
+        };
+        const ecoCi = EcoCI(config, parametersMetadata);
+        const inputs = [
+          {
+            timestamp: '2024-07-24T10:00',
+            duration: 11 * 60 * 60,
+          },
+        ];
+
+        mock
+          .onGet('https://api.green-coding.io/v1/ci/measurements', config)
+          .reply(200, {
+            success: true,
+            data: responseData,
+          });
+        const response = await ecoCi.execute(inputs);
+        expect.assertions(3);
+
+        expect(response).toBeInstanceOf(Array);
+
+        response.forEach((item) => {
+          expect(item).toHaveProperty('energy', 0.000002359942);
+          expect(item).toHaveProperty('carbon', 0.040704559);
         });
       });
 

@@ -2,11 +2,11 @@
 
 ## Overview
 
-The EcoCI plugin retrieves the `energy` and the `carbon` of the workflow of the given repository using the [Green Metrics](https://metrics.green-coding.io/index.html) API, if the workflow of the repository is listed in the [CI projects](https://metrics.green-coding.io/ci-index.html).
+The EcoCI plugin retrieves the `energy` and the `carbon` of the workflow of the given repository using the [Green Coding](https://metrics.green-coding.io/index.html) API, if the workflow of the repository is listed in the [CI projects](https://metrics.green-coding.io/ci-index.html).
 
 ## Implementation
 
-The EcoCI plugin fetches the `energy` and `carbon` of the specified workflow from the Green Metrics API for each entry in a manifest's input data.
+The EcoCI plugin fetches the `energy` and `carbon` of the specified workflow from the Green Coding API for each entry in a manifest's input data.
 
 - The `timestamp` and `duration` fields in the input data are used to filter the `energy` and `carbon` data. The relevant endpoint is documented [here](https://api.green-coding.io/docs).
 
@@ -40,13 +40,15 @@ runPlugin();
 ## Global Config
 
 - `repo`: (required) string specifies the name of the organization (or owner) and repository name, combined with `/`, e.g. `Green-Software-Foundation/if`
-- `branch`: (required) string specifies the branch of the repository
+- `branch`: (required) string specifies the branch of the repository. You can also use the `all` option to retrieve data for all branches within the specified time range
 - `workflow`: (required) number specifies the workflow id of the repository
+- `start-date`: (optional) string specifies the start of the time range for retrieving data. If not provided, the plugin defaults to using a `timestamp` from the input.
+- `end-date`: (optional) string specifies the end of the time range. If not provided, the plugin defaults to using the `duration` from the input.
 
 ## Input Parameters
 
 - `timestamp`: (required) specifies the start of the time range for retrieving data from the EcoCI API.
-- `duration`: (required) specifies the end of the time range for retrieving data from the API. It can be either number or string like `24 * 60 * 60 * 1000`.
+- `duration`: (required) specifies the end of the time range for retrieving data from the API. It can be either number or string like `24 * 60 * 60`.
 
 ## Output
 
@@ -82,18 +84,19 @@ initialize:
       path: 'if-eco-ci-plugin'
       global-config:
         repo: 'Green-Software-Foundation/if'
-        branch: main
+        branch: all
         workflow: 66389738
+        start-date: 2024-07-24T10:30
+        end-date: 2024-08-14T10:30
 tree:
   children:
     child:
       pipeline:
         compute:
           - ci/cd
-      config:
       inputs:
         - timestamp: 2024-07-09T00:00
-          duration: 24 * 60 * 60 * 100
+          duration: 24 * 60 * 60
 ```
 
 Now, when you run the `manifest` using the IF CLI, it will load the model automatically. Run using:
@@ -104,6 +107,6 @@ if-run -m <path-to-your-manifest>
 
 ## References
 
-The plugin simply grabs data for a given repository from the [Green Metrics API](metrics.green-coding.io).
+The plugin simply grabs data for a given repository from the [Green Coding API](metrics.green-coding.io).
 
 - To calculate `energy` and `carbon`, the plugin uses [this](https://api.green-coding.io/docs#/default/get_ci_measurements_v1_ci_measurements_get) endpoint.
