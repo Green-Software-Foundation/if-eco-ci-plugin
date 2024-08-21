@@ -37,7 +37,7 @@ async function runPlugin() {
 runPlugin();
 ```
 
-## Global Config
+## Config
 
 - `repo`: (required) string specifies the name of the organization (or owner) and repository name, combined with `/`, e.g. `Green-Software-Foundation/if`
 - `branch`: (required) string specifies the branch of the repository. You can also use the `all` option to retrieve data for all branches within the specified time range
@@ -50,6 +50,19 @@ runPlugin();
 - `timestamp`: (required) specifies the start of the time range for retrieving data from the EcoCI API.
 - `duration`: (required) specifies the end of the time range for retrieving data from the API. It can be either number or string like `24 * 60 * 60`.
 
+## Mapping
+
+The `mapping` block is an optional block. It is added in the plugin section and allows the plugin to map the output parameters of the plugin. The structure of the `mapping` block is:
+
+```yaml
+eco-ci-plugin:
+  path: if-eco-ci-plugin
+  method: EcoCI
+  mapping:
+    energy: 'energy-used-in-if-all'
+    carbon: 'carbon-used-in-if-all'
+```
+
 ## Output
 
 - `energy`: output the size of the given repository, represented in `GB`.
@@ -61,7 +74,7 @@ The plugin can throw the following errors:
 
 - `APIRequestError`: caused by a problem retrieving data from the API. The error message returned from the API is echoed in the IF error message.
 - `InputValidationError`: thrown when some data in the input is incorrect or missing.
-- `GlobalConfigError`: thrown when some data in the global config is incorrect or missing.
+- `ConfigError`: thrown when some data in the global config is incorrect or missing.
 
 ## Integration into Impact Framework
 
@@ -82,12 +95,15 @@ initialize:
     ci/cd:
       method: EcoCI
       path: 'if-eco-ci-plugin'
-      global-config:
+      config:
         repo: 'Green-Software-Foundation/if'
         branch: all
         workflow: 66389738
         start-date: 2024-07-24T10:30
         end-date: 2024-08-14T10:30
+      mapping:
+        energy: 'energy-used-in-if-all'
+        carbon: 'carbon-used-in-if-all'
 tree:
   children:
     child:
