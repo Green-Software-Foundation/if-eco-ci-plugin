@@ -1,21 +1,24 @@
 import { z } from 'zod';
 import moment from 'moment-timezone';
 import { ERRORS, validate } from '@grnsft/if-core/utils';
+import { mapOutputIfNeeded } from '@grnsft/if-core/utils/helpers';
 import {
   PluginParams,
   ExecutePlugin,
   ConfigParams,
   PluginParametersMetadata,
+  MappingParams,
 } from '@grnsft/if-core/types';
 
 import { EcoCiAPI } from './api';
 import { EcoCiParams } from './types';
 
-const { GlobalConfigError } = ERRORS;
+const { ConfigError } = ERRORS;
 
 export const EcoCI = (
   globalConfig: ConfigParams,
-  parametersMetadata: PluginParametersMetadata
+  parametersMetadata: PluginParametersMetadata,
+  mapping: MappingParams
 ): ExecutePlugin => {
   const metadata = {
     kind: 'execute',
@@ -46,11 +49,13 @@ export const EcoCI = (
 
       const { energy, carbon } = calculateMetrics(result, input);
 
-      return {
+      const output = {
         ...input,
         energy,
         carbon,
       };
+
+      return mapOutputIfNeeded(output, mapping);
     });
   };
 
@@ -175,7 +180,7 @@ export const EcoCI = (
    */
   const validateGlobalConfig = () => {
     if (!globalConfig) {
-      throw new GlobalConfigError('Global config is not provided.');
+      throw new ConfigError('Global config is not provided.');
     }
 
     const schema = z.object({
