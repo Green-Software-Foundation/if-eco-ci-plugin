@@ -4,7 +4,7 @@ import { ERRORS } from '@grnsft/if-core/utils';
 
 import { EcoCI } from '../../../lib/eco-ci';
 
-const { InputValidationError, GlobalConfigError } = ERRORS;
+const { InputValidationError, ConfigError } = ERRORS;
 const mock = new AxiosMockAdapter(axios);
 
 describe('lib/eco-ci: ', () => {
@@ -101,7 +101,7 @@ describe('lib/eco-ci: ', () => {
     ];
 
     it('has metadata field.', () => {
-      const ecoCi = EcoCI({}, parametersMetadata);
+      const ecoCi = EcoCI({}, parametersMetadata, {});
 
       expect.assertions(4);
       expect(ecoCi).toHaveProperty('metadata');
@@ -112,7 +112,7 @@ describe('lib/eco-ci: ', () => {
 
     describe('execute(): ', () => {
       it('executes with the correct data.', async () => {
-        const ecoCi = EcoCI(config, parametersMetadata);
+        const ecoCi = EcoCI(config, parametersMetadata, {});
         const inputs = [
           {
             timestamp: '2024-07-24T00:00',
@@ -137,13 +137,46 @@ describe('lib/eco-ci: ', () => {
         });
       });
 
+      it('successfully executes when the mapping maps output parameters.', async () => {
+        const mapping = {
+          energy: 'energy-used-in-if-main',
+          carbon: 'carbon-used-in-if-main',
+        };
+        const ecoCi = EcoCI(config, parametersMetadata, mapping);
+        const inputs = [
+          {
+            timestamp: '2024-07-24T00:00',
+            duration: 24 * 60 * 60,
+          },
+        ];
+
+        mock
+          .onGet('https://api.green-coding.io/v1/ci/measurements', config)
+          .reply(200, {
+            success: true,
+            data: responseData,
+          });
+        const response = await ecoCi.execute(inputs);
+        expect.assertions(3);
+
+        expect(response).toBeInstanceOf(Array);
+
+        response.forEach((item) => {
+          expect(item).toHaveProperty(
+            'energy-used-in-if-main',
+            0.0000046811586
+          );
+          expect(item).toHaveProperty('carbon-used-in-if-main', 0.081959585);
+        });
+      });
+
       it('executes when the time range is smaller than the API data time range.', async () => {
         const config = {
           repo: 'Green-Software-Foundation/if',
           branch: 'main',
           workflow: 66389738,
         };
-        const ecoCi = EcoCI(config, parametersMetadata);
+        const ecoCi = EcoCI(config, parametersMetadata, {});
         const inputs = [
           {
             timestamp: '2024-07-24T10:00',
@@ -175,7 +208,7 @@ describe('lib/eco-ci: ', () => {
           workflow: 66389738,
           'start-date': '2024-07-24',
         };
-        const ecoCi = EcoCI(config, parametersMetadata);
+        const ecoCi = EcoCI(config, parametersMetadata, {});
         const inputs = [
           {
             timestamp: '2024-07-24T10:00',
@@ -201,7 +234,7 @@ describe('lib/eco-ci: ', () => {
       });
 
       it('throws an error when config is an empty object.', async () => {
-        const ecoCi = EcoCI({}, parametersMetadata);
+        const ecoCi = EcoCI({}, parametersMetadata, {});
         const inputs = [
           {
             timestamp: '2024-07-05T00:00',
@@ -224,14 +257,14 @@ describe('lib/eco-ci: ', () => {
 
       it('throws an error when config is not provided.', async () => {
         const config = undefined;
-        const ecoCi = EcoCI(config!, parametersMetadata);
+        const ecoCi = EcoCI(config!, parametersMetadata, {});
 
         expect.assertions(2);
         try {
           await ecoCi.execute([]);
         } catch (error) {
           if (error instanceof Error) {
-            expect(error).toBeInstanceOf(GlobalConfigError);
+            expect(error).toBeInstanceOf(ConfigError);
             expect(error.message).toEqual('Global config is not provided.');
           }
         }
