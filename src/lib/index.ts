@@ -17,12 +17,12 @@ export const EcoCI = PluginFactory({
       carbon: {
         description: 'the used carbon in running the workflow',
         unit: 'gCO2eq',
-        'aggregation-method': 'sum',
+        'aggregation-method': { time: 'sum', component: 'sum' },
       },
       energy: {
         description: 'the used energy in running the workflow',
         unit: 'kWh',
-        'aggregation-method': 'sum',
+        'aggregation-method': { time: 'sum', component: 'sum' },
       },
     },
   },
