@@ -1,4 +1,4 @@
-# README
+# Impact Framework Eco CI Plugin
 
 ## Overview
 
