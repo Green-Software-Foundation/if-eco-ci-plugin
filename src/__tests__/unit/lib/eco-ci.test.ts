@@ -2,9 +2,9 @@ import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { ERRORS } from '@grnsft/if-core/utils';
 
-import { EcoCI } from '../../../lib/eco-ci';
+import { EcoCI } from '../../../lib';
 
-const { InputValidationError, ConfigError } = ERRORS;
+const { ConfigError } = ERRORS;
 const mock = new AxiosMockAdapter(axios);
 
 describe('lib/eco-ci: ', () => {
@@ -233,7 +233,7 @@ describe('lib/eco-ci: ', () => {
         });
       });
 
-      it('throws an error when config is an empty object.', async () => {
+      it('throws an error when config is not provided.', async () => {
         const ecoCi = EcoCI({}, parametersMetadata, {});
         const inputs = [
           {
@@ -247,25 +247,8 @@ describe('lib/eco-ci: ', () => {
           await ecoCi.execute(inputs);
         } catch (error) {
           if (error instanceof Error) {
-            expect(error).toBeInstanceOf(InputValidationError);
-            expect(error.message).toEqual(
-              '"repo" parameter is required. Error code: invalid_type.,"branch" parameter is required. Error code: invalid_type.,"workflow" parameter is required. Error code: invalid_type.'
-            );
-          }
-        }
-      });
-
-      it('throws an error when config is not provided.', async () => {
-        const config = undefined;
-        const ecoCi = EcoCI(config!, parametersMetadata, {});
-
-        expect.assertions(2);
-        try {
-          await ecoCi.execute([]);
-        } catch (error) {
-          if (error instanceof Error) {
             expect(error).toBeInstanceOf(ConfigError);
-            expect(error.message).toEqual('Global config is not provided.');
+            expect(error.message).toEqual('Config is not provided.');
           }
         }
       });

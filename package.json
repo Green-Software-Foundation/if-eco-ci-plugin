@@ -10,8 +10,8 @@
     "url": "https://github.com/Green-Software-Foundation/if-plugin-template/issues/new?assignees=&labels=feedback&projects=&template=feedback.md&title=Feedback+-+"
   },
   "dependencies": {
-    "@grnsft/if-core": "^0.0.18",
-    "axios": "^1.7.2",
+    "@grnsft/if-core": "^0.0.25",
+    "axios": "^1.7.7",
     "axios-mock-adapter": "^1.22.0",
     "dotenv": "^16.4.5",
     "moment": "^2.30.1",
