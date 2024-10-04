@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import {z} from 'zod';
 import moment from 'moment-timezone';
-import { ERRORS, validate } from '@grnsft/if-core/utils';
-import { mapOutputIfNeeded } from '@grnsft/if-core/utils/helpers';
+import {ERRORS, validate} from '@grnsft/if-core/utils';
+import {mapOutputIfNeeded} from '@grnsft/if-core/utils/helpers';
 import {
   PluginParams,
   ExecutePlugin,
@@ -10,10 +10,10 @@ import {
   MappingParams,
 } from '@grnsft/if-core/types';
 
-import { EcoCiAPI } from './api';
-import { EcoCiParams } from './types';
+import {EcoCiAPI} from './api';
+import {EcoCiParams} from './types';
 
-const { ConfigError } = ERRORS;
+const {ConfigError} = ERRORS;
 
 export const EcoCI = (
   globalConfig: ConfigParams,
@@ -47,7 +47,7 @@ export const EcoCI = (
     return inputs.map((input, index) => {
       validateInput(input, index);
 
-      const { energy, carbon } = calculateMetrics(result, input);
+      const {energy, carbon} = calculateMetrics(result, input);
 
       const output = {
         ...input,
@@ -83,7 +83,7 @@ export const EcoCI = (
       start && !end ? start : end || inputs[inputs.length - 1].timestamp;
     const evaledDuration = eval(inputs[inputs.length - 1]?.duration);
 
-    const { startDate, endDate } = getOnlyDates(
+    const {startDate, endDate} = getOnlyDates(
       firstTimestamp,
       endTimestamp,
       evaledDuration
@@ -105,10 +105,10 @@ export const EcoCI = (
    */
   const calculateMetrics = (metrics: [], input: PluginParams) => {
     const kWhForJ = 2.78e-8;
-    const { 'start-date': startDate, 'end-date': endDate } = globalConfig;
+    const {'start-date': startDate, 'end-date': endDate} = globalConfig;
 
     const data = metrics.reduce(
-      (acc: { energy: number; carbon: number }, item: number[]) => {
+      (acc: {energy: number; carbon: number}, item: number[]) => {
         const dateInMilliseconds = moment
           .tz(item[3].toString(), 'UTC')
           .toDate()
@@ -124,9 +124,9 @@ export const EcoCI = (
           return acc;
         }
 
-        return { energy: acc.energy, carbon: acc.carbon };
+        return {energy: acc.energy, carbon: acc.carbon};
       },
-      { energy: 0, carbon: 0 }
+      {energy: 0, carbon: 0}
     );
 
     data.energy = (data.energy / 1000) * kWhForJ;
