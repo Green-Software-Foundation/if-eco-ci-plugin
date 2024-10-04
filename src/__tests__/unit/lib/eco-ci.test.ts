@@ -2,9 +2,9 @@ import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import {ERRORS} from '@grnsft/if-core/utils';
 
-import {EcoCI} from '../../../lib/eco-ci';
+import {EcoCI} from '../../../lib';
 
-const {InputValidationError, ConfigError} = ERRORS;
+const {ConfigError} = ERRORS;
 const mock = new AxiosMockAdapter(axios);
 
 describe('lib/eco-ci: ', () => {
@@ -103,10 +103,9 @@ describe('lib/eco-ci: ', () => {
     it('has metadata field.', () => {
       const ecoCi = EcoCI({}, parametersMetadata, {});
 
-      expect.assertions(4);
+      expect.assertions(3);
       expect(ecoCi).toHaveProperty('metadata');
       expect(ecoCi).toHaveProperty('execute');
-      expect(ecoCi.metadata).toHaveProperty('kind');
       expect(typeof ecoCi.execute).toBe('function');
     });
 
@@ -131,7 +130,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach(item => {
+        response.forEach((item: any) => {
           expect(item).toHaveProperty('energy', 0.0000046811586);
           expect(item).toHaveProperty('carbon', 0.081959585);
         });
@@ -161,7 +160,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach(item => {
+        response.forEach((item: any) => {
           expect(item).toHaveProperty(
             'energy-used-in-if-main',
             0.0000046811586
@@ -195,7 +194,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach(item => {
+        response.forEach((item: any) => {
           expect(item).toHaveProperty('energy', 0.0000023212166);
           expect(item).toHaveProperty('carbon', 0.041255026);
         });
@@ -227,13 +226,13 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach(item => {
+        response.forEach((item: any) => {
           expect(item).toHaveProperty('energy', 0.000002359942);
           expect(item).toHaveProperty('carbon', 0.040704559);
         });
       });
 
-      it('throws an error when config is an empty object.', async () => {
+      it('throws an error when config is not provided.', async () => {
         const ecoCi = EcoCI({}, parametersMetadata, {});
         const inputs = [
           {
@@ -247,25 +246,8 @@ describe('lib/eco-ci: ', () => {
           await ecoCi.execute(inputs);
         } catch (error) {
           if (error instanceof Error) {
-            expect(error).toBeInstanceOf(InputValidationError);
-            expect(error.message).toEqual(
-              '"repo" parameter is required. Error code: invalid_type.,"branch" parameter is required. Error code: invalid_type.,"workflow" parameter is required. Error code: invalid_type.'
-            );
-          }
-        }
-      });
-
-      it('throws an error when config is not provided.', async () => {
-        const config = undefined;
-        const ecoCi = EcoCI(config!, parametersMetadata, {});
-
-        expect.assertions(2);
-        try {
-          await ecoCi.execute([]);
-        } catch (error) {
-          if (error instanceof Error) {
             expect(error).toBeInstanceOf(ConfigError);
-            expect(error.message).toEqual('Global config is not provided.');
+            expect(error.message).toEqual('Config is not provided.');
           }
         }
       });

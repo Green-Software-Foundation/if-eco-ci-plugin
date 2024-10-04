@@ -23,7 +23,8 @@ async function runPlugin() {
     branch: 'main',
     workflow: 66389738,
   };
-  const ecoCi = await new EcoCI(config);
+  const parameterMetadata = { inputs: {}, output: {} };
+  const ecoCi = EcoCI(config, parameterMetadata, {});
   const usage = await ecoCi.execute([
     {
       timestamp: '2024-07-09T00:00',
