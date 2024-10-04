@@ -1,14 +1,14 @@
-import { z } from 'zod';
+import {z} from 'zod';
 import moment from 'moment-timezone';
 
-import { PluginParams, ConfigParams } from '@grnsft/if-core/types';
-import { PluginFactory } from '@grnsft/if-core/interfaces';
-import { ERRORS, validate } from '@grnsft/if-core/utils';
+import {PluginParams, ConfigParams} from '@grnsft/if-core/types';
+import {PluginFactory} from '@grnsft/if-core/interfaces';
+import {ERRORS, validate} from '@grnsft/if-core/utils';
 
-import { EcoCiAPI } from './api';
-import { EcoCiParams } from './types';
+import {EcoCiAPI} from './api';
+import {EcoCiParams} from './types';
 
-const { ConfigError } = ERRORS;
+const {ConfigError} = ERRORS;
 
 export const EcoCI = PluginFactory({
   metadata: {
@@ -17,20 +17,20 @@ export const EcoCI = PluginFactory({
       carbon: {
         description: 'the used carbon in running the workflow',
         unit: 'gCO2eq',
-        'aggregation-method': { time: 'sum', component: 'sum' },
+        'aggregation-method': {time: 'sum', component: 'sum'},
       },
       energy: {
         description: 'the used energy in running the workflow',
         unit: 'kWh',
-        'aggregation-method': { time: 'sum', component: 'sum' },
+        'aggregation-method': {time: 'sum', component: 'sum'},
       },
     },
   },
   implementation: async (inputs: PluginParams[], config: ConfigParams) => {
     const result = await getRepoMetrics(config, inputs);
 
-    return inputs.map((input) => {
-      const { energy, carbon } = calculateMetrics(result, { input, config });
+    return inputs.map(input => {
+      const {energy, carbon} = calculateMetrics(result, {input, config});
 
       return {
         ...input,
@@ -72,20 +72,14 @@ export const EcoCI = PluginFactory({
  * Gets metrics for the specified repository.
  */
 const getRepoMetrics = async (config: ConfigParams, inputs: PluginParams[]) => {
-  const {
-    repo,
-    branch,
-    workflow,
-    'start-date': start,
-    'end-date': end,
-  } = config;
+  const {repo, branch, workflow, 'start-date': start, 'end-date': end} = config;
 
   const firstTimestamp = start || inputs[0].timestamp;
   const endTimestamp =
     start && !end ? start : end || inputs[inputs.length - 1].timestamp;
   const evaledDuration = eval(inputs[inputs.length - 1]?.duration);
 
-  const { startDate, endDate } = getOnlyDates(
+  const {startDate, endDate} = getOnlyDates(
     firstTimestamp,
     endTimestamp,
     evaledDuration
@@ -108,13 +102,13 @@ const getRepoMetrics = async (config: ConfigParams, inputs: PluginParams[]) => {
 
 const calculateMetrics = (
   metrics: [],
-  { input, config }: { input: PluginParams; config: ConfigParams }
+  {input, config}: {input: PluginParams; config: ConfigParams}
 ) => {
   const kWhForJ = 2.78e-8;
-  const { 'start-date': startDate, 'end-date': endDate } = config;
+  const {'start-date': startDate, 'end-date': endDate} = config;
 
   const data = metrics.reduce(
-    (acc: { energy: number; carbon: number }, item: number[]) => {
+    (acc: {energy: number; carbon: number}, item: number[]) => {
       const dateInMilliseconds = moment
         .tz(item[3].toString(), 'UTC')
         .toDate()
@@ -130,9 +124,9 @@ const calculateMetrics = (
         return acc;
       }
 
-      return { energy: acc.energy, carbon: acc.carbon };
+      return {energy: acc.energy, carbon: acc.carbon};
     },
-    { energy: 0, carbon: 0 }
+    {energy: 0, carbon: 0}
   );
 
   data.energy = (data.energy / 1000) * kWhForJ;

@@ -1,11 +1,10 @@
 import axios from 'axios';
 import moment from 'moment-timezone';
+import {ERRORS} from '@grnsft/if-core/utils';
 
-import { ERRORS } from '@grnsft/if-core/utils';
+import {EcoCiParams} from './types';
 
-import { EcoCiParams } from './types';
-
-const { APIRequestError } = ERRORS;
+const {APIRequestError} = ERRORS;
 
 export const EcoCiAPI = () => {
   const greenCodingAPI = axios.create({
@@ -13,9 +12,9 @@ export const EcoCiAPI = () => {
   });
 
   greenCodingAPI?.interceptors?.response?.use(
-    (response) => {
+    response => {
       // In case of status 204, the API returns `statusText: No Content` and the `data: undefined`
-      if (response.status == 204) {
+      if (response.status === 204) {
         return [];
       }
 
@@ -29,7 +28,7 @@ export const EcoCiAPI = () => {
 
       return response.data.data;
     },
-    (error) => {
+    error => {
       const errorMessage = error?.response?.data?.err[0]?.msg;
       if (error.response) {
         throw new APIRequestError(

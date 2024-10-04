@@ -1,1 +1,1 @@
-export { EcoCI } from './lib';
+export {EcoCI} from './lib';
