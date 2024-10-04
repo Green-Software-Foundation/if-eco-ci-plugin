@@ -1,10 +1,10 @@
 import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
-import { ERRORS } from '@grnsft/if-core/utils';
+import {ERRORS} from '@grnsft/if-core/utils';
 
-import { EcoCI } from '../../../lib/eco-ci';
+import {EcoCI} from '../../../lib/eco-ci';
 
-const { InputValidationError, ConfigError } = ERRORS;
+const {InputValidationError, ConfigError} = ERRORS;
 const mock = new AxiosMockAdapter(axios);
 
 describe('lib/eco-ci: ', () => {
@@ -131,7 +131,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach((item) => {
+        response.forEach(item => {
           expect(item).toHaveProperty('energy', 0.0000046811586);
           expect(item).toHaveProperty('carbon', 0.081959585);
         });
@@ -161,7 +161,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach((item) => {
+        response.forEach(item => {
           expect(item).toHaveProperty(
             'energy-used-in-if-main',
             0.0000046811586
@@ -195,7 +195,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach((item) => {
+        response.forEach(item => {
           expect(item).toHaveProperty('energy', 0.0000023212166);
           expect(item).toHaveProperty('carbon', 0.041255026);
         });
@@ -227,7 +227,7 @@ describe('lib/eco-ci: ', () => {
 
         expect(response).toBeInstanceOf(Array);
 
-        response.forEach((item) => {
+        response.forEach(item => {
           expect(item).toHaveProperty('energy', 0.000002359942);
           expect(item).toHaveProperty('carbon', 0.040704559);
         });
