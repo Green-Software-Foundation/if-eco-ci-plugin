@@ -23,7 +23,7 @@ async function runPlugin() {
     branch: 'main',
     workflow: 66389738,
   };
-  const parameterMetadata = { inputs: {}, output: {} };
+  const parameterMetadata = {inputs: {}, output: {}};
   const ecoCi = EcoCI(config, parameterMetadata, {});
   const usage = await ecoCi.execute([
     {
@@ -66,8 +66,8 @@ eco-ci-plugin:
 
 ## Output
 
-- `energy`: output the size of the given repository, represented in `GB`.
-- `carbon`: output the clones count of the given repository in the specified time range.
+- `energy`: output the size of the given repository, represented in `kWh`.
+- `carbon`: output the clones count of the given repository in the specified time range, represented in `gCo2eq`.
 
 ## Error Handling
 

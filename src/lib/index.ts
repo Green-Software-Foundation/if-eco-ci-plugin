@@ -110,7 +110,7 @@ const calculateMetrics = (
   const data = metrics.reduce(
     (acc: {energy: number; carbon: number}, item: number[]) => {
       const dateInMilliseconds = moment
-        .tz(item[3].toString(), 'UTC')
+        .tz(item[2].toString(), 'UTC')
         .toDate()
         .getTime();
       const startRange = moment.utc(startDate || input.timestamp).valueOf();
@@ -120,7 +120,8 @@ const calculateMetrics = (
 
       if (dateInMilliseconds >= startRange && dateInMilliseconds < endRange) {
         acc.energy += item[0];
-        acc.carbon += parseFloat(item[item.length - 1].toString());
+        acc.carbon += parseFloat(item[item.length - 1]?.toString());
+
         return acc;
       }
 
@@ -129,7 +130,12 @@ const calculateMetrics = (
     {energy: 0, carbon: 0}
   );
 
-  data.energy = (data.energy / 1000) * kWhForJ;
+  // Convert MJ to Joules (1 MJ = 1,000,000 J) and then
+  // convert Joules to kWh (1 kWh = 3,600,000 J)
+  data.energy = (data.energy / 1000000) * kWhForJ;
+
+  // Convert micro-grams to grams to get gCO2eq unit
+  data.carbon = data.carbon * 1e-6;
 
   return data;
 };
