@@ -1,7 +1,7 @@
 {
   "name": "@grnsft/if-eco-ci-plugin",
   "description": "EcoCI plugin for Impact Framework.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Green Software Foundation",
     "email": "info@gsf.com"
